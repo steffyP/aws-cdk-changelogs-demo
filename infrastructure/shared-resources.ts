@@ -93,7 +93,7 @@ export class SharedResources extends Stack {
     // The GitHub auth token secret
     this.githubToken = new secretsmanager.Secret(this, 'github-token', {
       secretObjectValue: {
-        token: SecretValue.unsafePlainText('fake')
+        token: SecretValue.unsafePlainText('fake') // TODO this cannot work
       },
     });
 

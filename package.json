@@ -9,7 +9,9 @@
   },
   "scripts": {
     "setup": "npm install; cd app; npm install",
-    "synth": "cdk synth --app='ts-node index.ts' || true"
+    "bootstrap": "cdklocal bootstrap aws://000000000000/us-east-1",
+    "synth": "cdklocal synth --app='ts-node index.ts' || true",
+    "deploy": "cdklocal deploy --all --require-approval never"
   },
   "dependencies": {
     "@types/node": "^18.11.3"

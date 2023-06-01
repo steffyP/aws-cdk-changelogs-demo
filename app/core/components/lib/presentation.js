@@ -3,7 +3,14 @@ import highlight from 'highlight.js';
 import fs from 'fs';
 import _ from 'lodash';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
-var S3 = new S3Client();
+
+var S3 = new S3Client({
+  endpoint: 'http://'+ process.env.LOCALSTACK_HOSTNAME + ':4566',
+  s3ForcePathStyle: true, 
+  accessKeyId: 'test',
+  secretAccessKey: 'test',
+  region: process.env.AWS_REGION,
+});
 
 // Build a custom markdown renderer. This lets us clean up the changelogs a bit
 var renderer = new marked.Renderer();
@@ -134,7 +141,11 @@ export const saveWebPage = async function (repoName, changelog) {
 export const regenerateHomePage = async function () {
   // Get the list of recently crawled changelogs
   var feed = await Changelogs.recentlyUpdated();
+  var html;
+  if (feed.length > 0) {
+    // cannot bulk load empty changelogs
 
+  
   // Fetch the metadata for each one
   var changelogs = _.uniq(_.map(feed, 'repo'));
   var metadata = await Changelogs.bulkGetMetadata(changelogs);
@@ -142,10 +153,15 @@ export const regenerateHomePage = async function () {
   // Ensure that the metadata is sorted by crawl order again
   // since DynamoDB returns the bulk get results in random order.
   metadata = _.sortBy(metadata, 'crawledAt').reverse();
-
-  var html = templates.homepage({
+  html = templates.homepage({
     feed: metadata
   });
+} else {
+  html = templates.homepage({
+    feed: []
+  });
+}
+  
 
   return await S3.send(new PutObjectCommand({
     Bucket: WEB_BUCKET_NAME,

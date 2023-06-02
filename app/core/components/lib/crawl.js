@@ -8,9 +8,16 @@ var ONE_MONTH = ONE_DAY * 30;
 var ONE_WEEK = ONE_DAY * 7;
 var SIX_MONTHS = ONE_MONTH * 6;
 
-var githubClient = Octokit({
-  auth: process.env.GITHUB_AUTH_TOKEN || 'github access token not set'
-});
+var authToken = process.env.GITHUB_AUTH_TOKEN || 'fake'
+
+var githubClient;
+if (authToken === 'fake'){
+  githubClient = Octokit();
+} else {
+  githubClient = Octokit({
+   auth: process.env.GITHUB_AUTH_TOKEN || 'github access token not set'
+  });
+}
 
 const httpOptions = {
   headers: {
